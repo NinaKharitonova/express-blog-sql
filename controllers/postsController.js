@@ -16,15 +16,22 @@ const index = (req, res) => {
 // Show
 const show = (req, res) => {
   const id = parseInt(req.params.id);
-  const post = posts.find((p) => p.id === id);
+  const sqlBlog = "SELECT * FROM blog.posts WHERE `id` = ?";
 
-  if (!post) {
-    const err = new Error(`Post con ID ${id} non trovato`);
-    err.code = 404;
-    throw err;
-  }
+  connection.query(sqlBlog, [id], (err, results) => {
+    if (err) {
+      console.log(err);
+      return res.status(500).json({ error: "Database query failed" });
+    }
 
-  res.json(post);
+    if (results.length === 0) {
+      return res.status(404).json({ error: "Posts not found " });
+    }
+
+    let post = results[0];
+
+    res.json(post);
+  });
 };
 
 // Create
