@@ -1,19 +1,15 @@
-// Controller per i Post
-const posts = require("../data/arrayPosts");
+const connection = require("../db/connect");
 
 // Index
 const index = (req, res) => {
-  const { tag } = req.query;
+  let sql = "SELECT * FROM blog.posts";
 
-  // Filtra i post per tag, se fornito
-  const filteredPosts = tag
-    ? posts.filter((post) => post.tags.includes(tag))
-    : posts;
-
-  res.json({
-    message: "Lista dei post",
-    count: filteredPosts.length,
-    posts: filteredPosts,
+  connection.query(sql, (err, results) => {
+    if (err) {
+      console.log(err);
+      return res.status(500).json({ error: "Database query failed" });
+    }
+    res.json(results);
   });
 };
 
