@@ -97,18 +97,15 @@ module.exports = {
 // Destroy
 const destroy = (req, res) => {
   const id = parseInt(req.params.id);
-  const index = posts.findIndex((p) => p.id === id);
+  const sql = "DELETE FROM blog.posts WHERE `id` = ?";
 
-  if (index === -1) {
-    const err = new Error(`Post con ID ${id} non trovato`);
-    err.code = 404;
-    throw err;
-  }
-
-  posts.splice(index, 1);
-
-  console.log("Lista aggiornata:", posts);
-  res.status(204).send(); // Nessun contenuto
+  connection.query(sql, [id], (err) => {
+    if (err) {
+      console.log(err);
+      return res.status(500).json({ error: "Database query failed" });
+    }
+    res.sendStatus(204);
+  });
 };
 
 module.exports = { index, show, create, update, destroy };
